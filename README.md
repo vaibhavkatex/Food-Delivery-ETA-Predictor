@@ -56,12 +56,12 @@ Random Forest is selected as the final model because it achieved the lowest MAE 
 ```text
 Food-Delivery-ETA-Predictor/
 │
-├── app.py                         # Streamlit prediction application
+├── app.py                             # Streamlit prediction application
 ├── Food_Delivery_ETA_Predictor.ipynb  # Data preprocessing and model training
-├── requirements.txt               # Application dependencies
-├── zomato_cleaned.csv             # Cleaned training dataset
-├── food_delivery_eta_model.pkl    # Trained Random Forest pipeline (generated during training)
-└── README.md                      # Project documentation
+├── requirements.txt                   # Application dependencies
+├── zomato_cleaned.csv                 # Cleaned training dataset
+├── food_delivery_eta_model.pkl        # Trained Random Forest pipeline (generated during training)
+└── README.md                          # Project documentation
 ```
 
 > `food_delivery_eta_model.pkl` is required by `app.py`. The repository currently contains the training notebook that generates this file with `joblib.dump()`.
