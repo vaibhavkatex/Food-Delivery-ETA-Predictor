@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -5,14 +6,16 @@ from huggingface_hub import hf_hub_download
 
 st.set_page_config(
     page_title="Food Delivery ETA Predictor",
-    page_icon="🍔"
+    page_icon="🍔",
+    layout="wide"
 )
 
-# IMPORTANT: Replace with your actual Hugging Face repository ID.
-MODEL_REPO_ID = "Vaibhavkate/Food-Delivery-ETA-Predictor"
+# Hugging Face model repository
+MODEL_REPO_ID = "Vaibhavkate/Food_Delivery_ETA_Predictor"
 MODEL_FILENAME = "food_delivery_eta_model.pkl"
 
-@st.cache_resource
+
+@st.cache_resource(show_spinner="Downloading and loading ML model...")
 def load_model():
     model_path = hf_hub_download(
         repo_id=MODEL_REPO_ID,
@@ -21,17 +24,24 @@ def load_model():
     )
     return joblib.load(model_path)
 
+
+# Load model
 try:
     model = load_model()
 except Exception as e:
-    st.error("Model load nahi hua. Hugging Face repository ID, filename aur repository visibility check karo.")
-    st.code(str(e))
+    st.error("Model load nahi hua.")
+    st.info(
+        "Hugging Face repository public hai ya nahi, "
+        "repository ID aur model filename check karo."
+    )
+    with st.expander("Technical error"):
+        st.code(str(e))
     st.stop()
+
 
 st.title("🍔 Food Delivery ETA Predictor")
 st.write("Predict food delivery time using a Random Forest model.")
 
-# Delivery details
 st.header("Delivery Details")
 
 col1, col2 = st.columns(2)
@@ -106,15 +116,7 @@ with col2:
     )
 
 
-
-
-
-
-
-
-
-# ---------------- Time Details ----------------
-
+# Order time
 st.header("🕒 Order Time")
 
 col1, col2, col3 = st.columns(3)
@@ -123,7 +125,7 @@ with col1:
     hour = st.selectbox(
         "Hour",
         list(range(1, 13)),
-        index=6   # Default: 7
+        index=6
     )
 
 with col2:
@@ -138,22 +140,21 @@ with col3:
     am_pm = st.selectbox(
         "AM / PM",
         ["AM", "PM"],
-        index=1   # Default: PM
+        index=1
     )
 
-# Convert 12-hour time to 24-hour time for the ML model
+
+# Convert 12-hour clock to 24-hour clock
 if am_pm == "AM":
     order_hour = 0 if hour == 12 else hour
 else:
     order_hour = 12 if hour == 12 else hour + 12
 
-# Display selected time
 time_display = f"{hour}:{minute:02d} {am_pm}"
-
 st.write(f"🕒 Order Time: **{time_display}**")
 
-# ---------------- Weekday ----------------
 
+# Weekday
 order_weekday_name = st.selectbox(
     "📅 Order Day",
     [
@@ -167,7 +168,6 @@ order_weekday_name = st.selectbox(
     ]
 )
 
-# Convert weekday name to number for the model
 weekday_map = {
     "Monday": 0,
     "Tuesday": 1,
@@ -179,11 +179,8 @@ weekday_map = {
 }
 
 order_weekday = weekday_map[order_weekday_name]
-
-# Weekend feature
 is_weekend = int(order_weekday >= 5)
 
-# Time period
 if order_hour < 12:
     time_period = "Morning"
 elif order_hour < 17:
@@ -197,9 +194,12 @@ st.write(f"🌤️ Time Period: **{time_period}**")
 st.write(f"📅 Selected Day: **{order_weekday_name}**")
 
 
-# Prediction
-if st.button("🚀 Predict ETA", type="primary", use_container_width=True):
-
+# Predict delivery time
+if st.button(
+    "🚀 Predict ETA",
+    type="primary",
+    use_container_width=True
+):
     new_order = pd.DataFrame({
         "Delivery_person_Age": [age],
         "Delivery_person_Ratings": [rating],
@@ -219,17 +219,21 @@ if st.button("🚀 Predict ETA", type="primary", use_container_width=True):
     })
 
     try:
-        prediction = model.predict(new_order)[0]
-        prediction = max(0, prediction)
+        prediction = float(model.predict(new_order)[0])
+        prediction = max(0.0, prediction)
 
         st.success(
             f"🕒 Estimated Delivery Time: {prediction:.0f} minutes"
         )
 
     except Exception as e:
-        st.error("Prediction failed.")
-        st.write(e)
+        st.error(
+            "Prediction failed. Model ke expected input features "
+            "aur input column names verify karo."
+        )
+        with st.expander("Technical error"):
+            st.code(str(e))
+
 
 st.divider()
-st.caption("Food Delivery ETA Predictor | Build by Vaibhav Kate")
-
+st.caption("Food Delivery ETA Predictor | Built by Vaibhav Kate")
