@@ -226,6 +226,9 @@ GitHub: https://github.com/vaibhavkatex
 
 Project: https://github.com/vaibhavkatex/Food-Delivery-ETA-Predictor
 
+## 💻 Live project on Streamlit + Huggingface
+https://food-delivery-eta-predictorx.streamlit.app/
+
 ## 📄 License
 
 No license file is currently included in the repository. Unless a license is added, the project should be treated as **all rights reserved** by its copyright holder.
