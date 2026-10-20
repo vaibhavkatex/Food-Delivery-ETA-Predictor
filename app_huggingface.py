@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 # IMPORTANT: Replace with your actual Hugging Face repository ID.
-MODEL_REPO_ID = "YOUR_USERNAME/food-delivery-eta-model"
+MODEL_REPO_ID = "Vaibhavkate/Food-Delivery-ETA-Predictor"
 MODEL_FILENAME = "food_delivery_eta_model.pkl"
 
 @st.cache_resource
